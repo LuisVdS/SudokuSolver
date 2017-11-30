@@ -15,6 +15,7 @@ function StartConf(hobj,~)
     uidata=guihandles(gcbf);
     uidata.ResetButton.Enable = 'On';
     uidata.SolveButton.Enable = 'On';
+    uidata.CandidatesButton.Enable = 'On';
     
 end
 
