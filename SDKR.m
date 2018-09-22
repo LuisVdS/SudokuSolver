@@ -7,7 +7,7 @@ function SDKR()
 %   Auteur: Luis Vieira da Silva
 %   Date de création: 22.12.2015
     version = '0.5.0';
-    datemodif = '20.07.2017';
+    datemodif = '23.09.2018';
     
 %% Définitions préalables
 dim=3; % Dimension de la grille (comprise entre 2 et 3)
@@ -26,8 +26,8 @@ switch dim
         return
 end
 
-eca=2; % Ecart entre cases (en pixels)-constante 
-big_eca=1; % Ecart entre zones 
+smallGap=2; % Ecart entre cases (en pixels)-constante 
+bigGap=1; % Ecart entre zones 
 
 %% Création UI
 hfig=figure('name',['SDKR v' version],...
@@ -45,18 +45,18 @@ for ind=1:dim^4
     
     % Ecart supplémentaire correspondant (séparation grands carrés)
     if mod(col,dim)==0
-        big_col=col/dim;
+        bigCol=col/dim;
     else
-        big_col=ceil(col/dim)+1;
+        bigCol=ceil(col/dim)+1;
     end
     
     if mod((dim^2-lig+1),dim)==0
-        big_lig=(dim^2-lig+1)/dim;
+        bigLine=(dim^2-lig+1)/dim;
     else 
-        big_lig=ceil((dim^2-lig+1)/dim)+1;
+        bigLine=ceil((dim^2-lig+1)/dim)+1;
     end
-    xPos=50+(taillecase+eca)*col+big_col*big_eca;
-    yPos=50+(taillecase+eca)*(dim^2-lig)+big_lig*big_eca;
+    xPos=50+(taillecase+smallGap)*col+bigCol*bigGap;
+    yPos=50+(taillecase+smallGap)*(dim^2-lig)+bigLine*bigGap;
     % Création cases
     hcell(ind)=uicontrol('parent',hfig,...
         'style','edit',...
@@ -67,16 +67,19 @@ for ind=1:dim^4
         'callback',@Controle);
     
     % Création sous-cases
-    for jnd=1:dim
-        for knd=1:dim
-            h_candcell(ind,jnd,knd)=uicontrol('parent',hfig,...
-                'style','text',...
-                'visible','on',...
-                'string','s',...
-                'position',[xPos+(jnd-1)*(taillecase/dim) yPos taillecase/dim taillecase/dim],...
-                'fontsize',taillechiffre/dim,...
-                'fontweight','normal');
-        end
+    for knd=1:dim^2
+        % Calcul de la ligne et colonne correspondante
+        [lig2,col2]=hcell2lcsub(dim,knd);
+        
+        h_candcell(ind,knd)=uicontrol('parent',hfig,...
+            'style','text',...
+            'visible','off',...
+            'string',num2str(knd),...
+            'position',[xPos+(lig2-1)*(taillecase/dim) yPos+(3-col2)*(taillecase/dim) taillecase/dim taillecase/dim],...
+            'fontsize',ceil(taillechiffre/dim),...
+            'fontweight','normal',...
+            'foregroundcolor',[0 0 0],...
+            'backgroundColor',[0.4 1 0.4]);
     end
     
 end
@@ -125,6 +128,7 @@ h_del=uicontrol('parent',hfig,...
 ui_struct=struct();
 ui_struct.hcell=hcell;
 ui_struct.dim=dim;
+ui_struct.h_candcell=h_candcell;
 guidata(hfig,ui_struct)
 
 end
